@@ -1,4 +1,4 @@
-from .main import getLine, chat, context, PROMPTER
+from .main import getLine, chat, context, PROMPTER, I
 from .abscontext import ContextObj
 import re
 
@@ -26,7 +26,16 @@ def _getat(self, name):
             del kwargs['_description']
         prompt = PROMPTER.prompt(name, 'm', comment, pargs, pkargs, description = descr ,owner_class = context[self.__class__.__name__])
         response = chat(prompt)
-        print(response)
+        if I == 'v':
+            print(response)
+        elif I == 'i':
+            print(response)
+            critique = input('Comments (type "y" to accept the code): ')
+            while not (critique == 'y'):
+                prompt += [('assistant', response), ('user', critique)]
+                response = chat(prompt)
+                print(response)
+                critique = input('Comments (type "y" to accept the code): ')
         _addM(self.__class__.__name__, response)
         tmpname = self.__class__.__name__ + '_' + name
         response = re.sub(f'''def {name}''', f'def {tmpname}', response)
@@ -52,13 +61,24 @@ def __getattr__(name):
         pkargs = [str(k) + ' of type ' + type(v).__name__ for k, v in kwargs.items()]
         prompt = PROMPTER.prompt(name, 'c', comment, pargs, pkargs, description=descr)
         response = chat(prompt)
+        if I == 'v':
+            print(response)
+        elif I == 'i':
+            print(response)
+            critique = input('Comments (type "y" to accept the code): ')
+            while not (critique == 'y'):
+                prompt += [('assistant', response), ('user', critique)]
+                response = chat(prompt)
+                print(response)
+                critique = input('Comments (type "y" to accept the code): ')
+                
+        exec(response, globals = globals())      
         base_def = response.lstrip()
         ident = base_def.split('\n')[1]
         ident = len(ident) - len(ident.lstrip())
         ident = ''.join(ident*[' '])
 
-        print(response)
-        exec(response, globals = globals())
+        
         globals()[name].__getattr__ = _getat
         
         tmp_context = ContextObj(name, response, descr, ident=ident)
