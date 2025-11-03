@@ -51,12 +51,18 @@ Or
 ``` python
 vibe.save(output.py, 'a') #Appends to output.py
 ```
+You can choose if you want to review the code generated or just run it:
+``` python
+vibe.I = 'i' # Allow you to see, add comments and regenerate the code until you are satisfied, it is the default
+vibe.I = 'v' # Print the code and execute it
+vibe.I = 'n' # Just execute the code
+```
 ### Full Example
 ``` python
-import vibecode as vibe
+import FocusedPythonicVibes as vibe
 
 vibe.connect_llm('your-url')
-
+vibe.I = 'v'
 result_func = vibe.f.closest_hash(1, list(range(10))) # Finds the element from the second parameter, iterable, that has the closest hash value to the first parameter
 print(result_func)
 
