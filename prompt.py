@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from .abscontext import ContextObj
+from .main import context
 
 class PromptMaker(ABC):
     def __init__(self):
@@ -26,13 +27,18 @@ class BasePromptMaker(PromptMaker):
         self.keyword_args_str = '''the following keyword arguments: {args}'''
         self.no_parameters_str = 'The {tip} is called without arguments in one of it\'s call'
         self.post_str = 'Generate only the python code of the {tip} and nothing else.'
+        self.context_str = 'Other functions and classes that might be useful to use are defined as: {codes}'
         self.replace = {'f': 'function',
                         'c': 'class',
                         'm': 'method',
                         }
 
 
-
+    def context(self, related):
+        l = list(set(context.stack+related))
+        cnt = [context[s].code_def for s in l]
+        return self.context_str.format(codes = '\n'.join(cnt))
+        
     def pre(self):
         '''
         First info passed into the prompt.
@@ -96,7 +102,7 @@ class BasePromptMaker(PromptMaker):
         '''
         return self.post_str.format(tip=tip)
 
-    def prompt(self, name: str, tip: str, comment: str, pargs: list = None, kargs: list = None, description = None, owner_class: ContextObj=None) -> str:
+    def prompt(self, name: str, tip: str, comment: str, pargs: list = None, kargs: list = None, description = None, owner_class: ContextObj=None, related = []) -> str:
         '''
         Generates the prompt and returns it as a string
         '''
@@ -124,5 +130,7 @@ class BasePromptMaker(PromptMaker):
         else:
             prompt += self.no_parameters_str.format(tip=tip)
         prompt += '. '
+        if related or context.stack:
+            prompt += self.context(related) + '\n'
         prompt += self.post(tip)
         return [('user', prompt)]
