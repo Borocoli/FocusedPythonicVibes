@@ -125,4 +125,4 @@ class BasePromptMaker(PromptMaker):
             prompt += self.no_parameters_str.format(tip=tip)
         prompt += '. '
         prompt += self.post(tip)
-        return prompt
+        return [('user', prompt)]
