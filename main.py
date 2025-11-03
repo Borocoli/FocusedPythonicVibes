@@ -4,13 +4,13 @@ import linecache
 import re
 import tokenize
 import io
-from .prompt import BasePromptMaker
 from .abscontext import GlobalContext
 
 LLM = None
 TOKENS = 1024
 MODEL = ''
 context = GlobalContext()
+from .prompt import BasePromptMaker
 PROMPTER = BasePromptMaker()
 ILVLS = ['n', 'v', 'i']
 I = 'i'
