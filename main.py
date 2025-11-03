@@ -12,6 +12,8 @@ TOKENS = 1024
 MODEL = ''
 context = GlobalContext()
 PROMPTER = BasePromptMaker()
+ILVLS = ['n', 'v', 'i']
+I = 'i'
 
 def connect_llm(URL, api='', model = ''):
     '''
@@ -29,13 +31,12 @@ def connect_llm(URL, api='', model = ''):
             base_url = URL,
             )
     return
-
+    
 def chat(prompt):
+    mess = [{'role': p[0], 'content': p[1]} for p in prompt]
     response = LLM.chat.completions.create(
             model = MODEL,
-            messages = [
-            {'role': 'user', 'content': prompt},
-            ],
+            messages = mess,
             max_tokens = TOKENS,
             )
     result = response.choices[0].message.content
