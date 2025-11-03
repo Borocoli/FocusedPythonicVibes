@@ -1,4 +1,4 @@
-from .main import getLine, chat, context, PROMPTER
+from .main import getLine, chat, context, PROMPTER, I
 from .abscontext import ContextObj
 
 def __getattr__(name):
@@ -14,7 +14,16 @@ def __getattr__(name):
             del kwargs['_description']
         prompt = PROMPTER.prompt(name, 'f', comment, pargs, pkargs, description=descr)
         response = chat(prompt)
-        print(response)
+        if I == 'v':
+            print(response)
+        elif I == 'i':
+            print(response)
+            critique = input('Comments (type "y" to accept the code): ')
+            while not (critique == 'y'):
+                prompt += [('assistant', response), ('user', critique)]
+                response = chat(prompt)
+                print(response)
+                critique = input('Comments (type "y" to accept the code): ')
         exec(response, globals = globals())
         
         tmp_context = ContextObj(name, response, descr)
